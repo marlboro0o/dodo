@@ -41,6 +41,26 @@ final class MenuScreenVC: UIViewController {
         }
     }
     
+    var basketButton: UIButton = {
+        
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "100"
+        configuration.image = UIImage(systemName: "cart.fill")
+        configuration.cornerStyle = .capsule
+        
+        var container = AttributeContainer()
+        container.font = UIFont.boldSystemFont(ofSize: 22)
+        configuration.attributedTitle = AttributedString("100", attributes: container)
+        
+        let button = UIButton(configuration: configuration)
+        ///*button.setImag*/e(UIImage(systemName: "cart.fill"), for: .normal)
+        //button.backgroundColor = .orange
+        button.tintColor = .orange
+        button.setTitleColor(.white, for: .normal)
+        //button.setTitle("100", for: .normal)
+        return button
+    }()
+    
     lazy var tableView: UITableView = {
         let tableView = UITableView.init() //Инициализируем таблицу
         tableView.backgroundColor = .orange //Поставим цвет чтобы увидеть таблицу на вью
@@ -129,12 +149,17 @@ extension MenuScreenVC {
     private func setupViews() {
         view.backgroundColor = .white
         view.addSubview(tableView)
+        view.addSubview(basketButton)
     }
     
     private func setupConstraints() {
         tableView.snp.makeConstraints { make in
             make.left.right.bottom.equalTo(view)
             make.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        basketButton.snp.makeConstraints { make in
+            make.right.bottom.equalTo(view).inset(10)
         }
     }
 }
