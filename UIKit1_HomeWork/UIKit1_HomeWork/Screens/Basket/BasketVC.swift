@@ -20,7 +20,8 @@ class BasketVC: UIViewController {
             tableView.reloadData()
         }
     }
-    private var productRepository: ProductRepository
+    private let suplementService: ISuplementService
+    private let productRepository: IProductRepository
     
     private lazy var closeButton: UIButton = {
         let button = UIButton()
@@ -52,9 +53,34 @@ class BasketVC: UIViewController {
         return tableView
     }()
     
-    init(productRepository: ProductRepository) {
-        //self.basket = basket
+    private lazy var footerStack: UIStackView = {
+        let stack = UIStackView()
+        stack.backgroundColor = .white
+        stack.axis = .vertical
+        stack.spacing = 5
+        stack.alignment = .center
+        return stack
+    }()
+    
+    private lazy var footerLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.text = "Доставим бесплатно"
+        return label
+    }()
+    
+    private lazy var footerButton: CapsuleButton = {
+        let button = CapsuleButton()
+        button.tintColor = .orange
+        button.setTitle("Оформить заказ", for: .normal)
+        button.addTarget(self, action: #selector(didTapPlaceOrder), for: .touchUpInside)
+        return button
+    }()
+    
+    init(productRepository: IProductRepository, suplementService: ISuplementService) {
         self.productRepository = productRepository
+        self.suplementService = suplementService
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -68,13 +94,18 @@ class BasketVC: UIViewController {
         setupViews()
         setupConstraints()
         fetchBasket()
+        setupObservers()
     }
     
     private func setupViews() {
         view.backgroundColor = .white
        
-        [closeButton, headerLabel, tableView].forEach {
+        [closeButton, headerLabel, tableView, footerStack].forEach {
             view.addSubview($0)
+        }
+        
+        [footerLabel, footerButton].forEach {
+            footerStack.addArrangedSubview($0)
         }
     }
     
@@ -90,20 +121,42 @@ class BasketVC: UIViewController {
         
         tableView.snp.makeConstraints { make in
             make.top.equalTo(headerLabel.snp.bottom).offset(50)
-            make.left.right.bottom.equalTo(view).inset(15)
+            make.left.right.equalTo(view).inset(15)
+        }
+        
+        footerStack.snp.makeConstraints { make in
+            make.top.equalTo(tableView.snp.bottom).offset(1)
+            make.left.equalTo(view).offset(15)
+            make.right.bottom.equalTo(view).inset(15)
+        }
+        
+        footerButton.snp.makeConstraints { make in
+            make.width.equalTo(view.snp.width).multipliedBy(0.8)
+            make.height.equalTo(50)
         }
     }
     
     private func fetchBasket() {
-//        if let basket = productStorage.loadProducts(forKey: "basket") {
-//            self.basket = basket
-//        }
         basket = productRepository.get()
+    }
+    
+    private func setupObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(updateBasket), name: .updateBasket, object: nil)
     }
     
     @objc
     private func didTapClosed() {
         dismiss(animated: true)
+    }
+    
+    @objc
+    private func updateBasket() {
+        fetchBasket()
+    }
+    
+    @objc
+    private func didTapPlaceOrder() {
+        present(di.screenFactory.makeMapVC(),animated: true)
     }
 }
 
@@ -135,6 +188,12 @@ extension BasketVC: UITableViewDataSource {
             let sum = basket.reduce(into: 0) { result, product in
                 result += product.getSum()
             }
+            let userInfo: [AnyHashable: Any] = ["value": sum]
+            NotificationCenter.default.post(
+                name: .totalPriceNotification,
+                object: nil,
+                userInfo: userInfo)
+            
             cell.configure(text: "\(basket.count) товар(а) на \(sum) P")
             return cell
         
@@ -143,7 +202,8 @@ extension BasketVC: UITableViewDataSource {
             cell.configure(product: basket[indexPath.row])
             
             cell.onTapChangeProduct = {
-                self.didTapClosed()
+                let vc = di.screenFactory.makeDetailProduct(product: self.basket[indexPath.row], operation: .change)
+                self.present(vc, animated: true)
             }
             cell.onTapChangeCountProduct = { value in
                 self.productRepository.update(product: self.basket[indexPath.row], count: value) { basket in

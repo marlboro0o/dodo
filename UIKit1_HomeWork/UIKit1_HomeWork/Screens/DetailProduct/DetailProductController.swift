@@ -16,13 +16,22 @@ class DetailProductController: UIViewController {
         case segments
         case supplements
     }
+    
+    enum OperationProduct {
+        case add
+        case change
+    }
+    
     private var suplements: [Suplement] = [] {
         didSet {
             tableView.reloadData()
         }
     }
+    private let operation: OperationProduct
     private var product: Product
-    private var productRepository: ProductRepository
+    private var sizeProduct: Product.Size
+    private var doughProduct: Product.Dough
+    private var productRepository: IProductRepository
     private let suplementService: ISuplementService
     private var basketSuplements: [Suplement] = [] {
         didSet {
@@ -49,10 +58,15 @@ class DetailProductController: UIViewController {
         return tableView
     }()
     
-    init(product: Product, suplementService: ISuplementService, productRepository: ProductRepository) {
+    init(product: Product, suplementService: ISuplementService, productRepository: IProductRepository, operation: OperationProduct) {
+        self.operation = operation
         self.product = product
         self.suplementService = suplementService
         self.productRepository = productRepository
+        self.sizeProduct = product.size ?? Product.defaultSize()
+        self.doughProduct = product.dough ?? Product.defaultDough()
+        self.basketSuplements = product.suplements ?? []
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -118,6 +132,13 @@ extension DetailProductController: UITableViewDelegate, UITableViewDataSource {
             return cell
         case .segments:
             let cell = tableView.dequeuCell(indexPath) as DetailSegmentsCell
+            cell.configure(size: sizeProduct, dough: doughProduct)
+            cell.onChangeSize = { value in
+                self.sizeProduct = Product.Size.init(rawValue: value) ?? Product.defaultSize()
+            }
+            cell.onChangeDough = { value in
+                self.doughProduct = Product.Dough.init(rawValue: value) ?? Product.defaultDough()
+            }
             return cell
         case .supplements:
             let cell = tableView.dequeuCell(indexPath) as DetailSupplementsContainerCell
@@ -153,21 +174,19 @@ extension DetailProductController: UITableViewDelegate, UITableViewDataSource {
                 result += suplement.price
             }
             
-            cell.configure(sum: sum)
+            cell.configure(sum: sum, operation: operation)
             cell.onTapBasket = {
                 //сохраняем в корзину
-                self.productRepository.add(product: self.product.productForBasket(suplements: self.basketSuplements))
-//                var basket = self.productRepository.loadProducts(forKey: "basket") ?? []
-//                basket.append(self.product.productForBasket(suplements: self.suplements))
-//                 
-//                do {
-//                    try self.productStorage.save(products: basket, forKey: "basket")
-//                } catch {
-//                    print(error)
-//                }
+                let productForBasket = self.product.productForBasket(suplements: self.basketSuplements, size: self.sizeProduct, dough: self.doughProduct)
                 
-                let vc = BasketVC(productRepository: self.productRepository)
-                self.present(vc, animated: true)
+                switch self.operation {
+                case .change:
+                    self.productRepository.change(product: productForBasket)
+                    NotificationCenter.default.post(name: .updateBasket, object: nil)
+                    self.dismiss(animated: true)
+                case .add:
+                    self.productRepository.add(product: productForBasket)
+                }
             }
             
             return cell

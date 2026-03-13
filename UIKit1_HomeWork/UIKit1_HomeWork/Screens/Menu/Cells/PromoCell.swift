@@ -45,13 +45,11 @@ class PromoCell: UITableViewCell {
         return label
     }()
     
-    private lazy var priceButton: UIButton = {
-        let button = UIButton()
+    private lazy var priceButton: CapsuleButton = {
+        let button = CapsuleButton()
         button.setTitle("от 369 руб", for: .normal)
-        button.backgroundColor = .white
-        button.layer.cornerRadius = 20
+        button.tintColor = .white
         button.setTitleColor(.black, for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
         
         return button
     }()

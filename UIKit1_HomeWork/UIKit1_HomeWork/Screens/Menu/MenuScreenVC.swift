@@ -10,6 +10,13 @@ import SnapKit
 
 final class MenuScreenVC: UIViewController {
 
+    enum MenuState {
+        case initial
+        case loading
+        case loaded
+        case error
+    }
+    
     enum MenuSection: Int {
         case stories
         case banners
@@ -17,51 +24,42 @@ final class MenuScreenVC: UIViewController {
         case products
     }
     
-    let productService: IProductService
-    let productRepository: ProductRepository
-    let categoryService: ICategoryService
-    let storyService: IStoryService
-    let suplementService: ISuplementService
+    private let productService: IProductService
+    private let productRepository: IProductRepository
+    private let categoryService: ICategoryService
+    private let storyService: IStoryService
     
-    var products: [Product] = []
-    var productsFilter: [Product] = [] {
+    private var state: MenuState = .initial {
+        didSet {
+            render()
+        }
+    }
+    private var products: [Product] = []
+    private var productsFilter: [Product] = [] {
         didSet {
             tableView.reloadSections(IndexSet(integer: MenuSection.products.rawValue), with: .automatic)
             tableView.reloadSections(IndexSet(integer: MenuSection.banners.rawValue), with: .automatic)
         }
     }
-    var categories: [Category] = [] {
+    private var categories: [Category] = [] {
         didSet {
             tableView.reloadData()
         }
     }
-    var stories: [Story] = [] {
+    private var stories: [Story] = [] {
         didSet {
             tableView.reloadSections(IndexSet(integer: MenuSection.stories.rawValue), with: .automatic)
         }
     }
     
-    var basketButton: UIButton = {
-        
-        var configuration = UIButton.Configuration.filled()
-        configuration.title = "100"
-        configuration.image = UIImage(systemName: "cart.fill")
-        configuration.cornerStyle = .capsule
-        
-        var container = AttributeContainer()
-        container.font = UIFont.boldSystemFont(ofSize: 22)
-        configuration.attributedTitle = AttributedString("100", attributes: container)
-        
-        let button = UIButton(configuration: configuration)
-        ///*button.setImag*/e(UIImage(systemName: "cart.fill"), for: .normal)
-        //button.backgroundColor = .orange
-        button.tintColor = .orange
-        button.setTitleColor(.white, for: .normal)
-        //button.setTitle("100", for: .normal)
+    private var basketButton: BasketButton = {
+        let button = BasketButton()
+        button.setTitle("1000", for: .normal)
+        button.isHidden = true
         return button
     }()
     
-    lazy var tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView.init() //Инициализируем таблицу
         tableView.backgroundColor = .orange //Поставим цвет чтобы увидеть таблицу на вью
         if #available(iOS 15.0, *) {
@@ -85,12 +83,10 @@ final class MenuScreenVC: UIViewController {
     init(productService: IProductService, 
          categoryService: ICategoryService,
          storyService: IStoryService,
-         suplementService: ISuplementService,
-         productRepository: ProductRepository) {
+         productRepository: IProductRepository) {
         self.productService = productService
         self.categoryService = categoryService
         self.storyService = storyService
-        self.suplementService = suplementService
         self.productRepository = productRepository
         super.init(nibName: nil, bundle: nil)
     }
@@ -104,9 +100,12 @@ final class MenuScreenVC: UIViewController {
 
         setupViews()
         setupConstraints()
+        setupTargets()
         fetchProducts()
         fetchCategories()
         fetchStories()
+        fetchBasket()
+        setupObservers()
     }
     
     private func fetchProducts() {
@@ -142,6 +141,48 @@ final class MenuScreenVC: UIViewController {
             }
         }
     }
+    
+    private func fetchBasket() {
+        let basket = productRepository.get()
+        basketButton.isHidden = basket.isEmpty
+        let sum = basket.reduce(into: 0) { result, product in
+            result += product.getSum()
+        }
+        basketButton.setTitle("\(sum) P", for: .normal)
+    }
+    
+    private func setupObservers() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(totalBasketPrice),
+                                               name: .totalPriceNotification,
+                                               object: nil)
+    }
+    
+    private func render() {
+        switch state {
+        case .initial, .loading:
+            print("init/loading")
+        case .loaded:
+            print("loaded")
+        case .error:
+            print("error")
+        }
+    }
+    
+    @objc
+    private func didTapBasket() {
+        present(
+            di.screenFactory.makeBasketVC(),
+            animated: true)
+    }
+    
+    @objc
+    private func totalBasketPrice(_ notification: Notification) {
+        if let value = notification.userInfo?["value"] as? Int {
+            basketButton.setTitle("\(value) P", for: .normal)
+            basketButton.isHidden = value == 0
+        }
+    }
 
 }
 
@@ -159,8 +200,12 @@ extension MenuScreenVC {
         }
         
         basketButton.snp.makeConstraints { make in
-            make.right.bottom.equalTo(view).inset(10)
+            make.right.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
         }
+    }
+    
+    private func setupTargets() {
+        basketButton.addTarget(self, action: #selector(didTapBasket), for: .touchUpInside)
     }
 }
 
@@ -258,7 +303,7 @@ extension MenuScreenVC: UITableViewDelegate {
         guard let section = MenuSection.init(rawValue: indexPath.section) else { return }
         
         if section == .products {
-            let vc = DetailProductController(product: products[indexPath.row], suplementService: suplementService, productRepository: productRepository)
+            let vc = di.screenFactory.makeDetailProduct(product: products[indexPath.row], operation: .add)
             present(vc, animated: true)
         }
     }

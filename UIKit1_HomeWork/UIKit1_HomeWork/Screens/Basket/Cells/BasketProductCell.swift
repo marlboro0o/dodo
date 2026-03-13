@@ -89,10 +89,11 @@ class BasketProductCell: UITableViewCell {
         productImageView.image = UIImage(named: product.image)
         nameLabel.text = product.name
         
+        let textSizeDough = "\(product.size?.description() ?? ""), \(product.dough?.description() ?? "")"
         let textSuplements = product.suplements?.reduce(into: []) { result, suplement in
             result.append(suplement.name)
         } .joined(separator: ", ") ?? ""
-        suplementsLabel.text = "+ \(textSuplements)"
+        suplementsLabel.text = "\(textSizeDough) \n+ \(textSuplements)"
         priceLabel.text = "\(product.getSum()) P"
         countStepper.currentValue = product.countInBasket ?? 1
     }
