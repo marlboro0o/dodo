@@ -52,6 +52,17 @@
 		77A357B12F2A859E000DE164 /* PhotoCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77A357B02F2A859E000DE164 /* PhotoCollectionCell.swift */; };
 		77A357B32F2D041A000DE164 /* BannerContainerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77A357B22F2D041A000DE164 /* BannerContainerCell.swift */; };
 		77A357B52F2D056F000DE164 /* BannerCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77A357B42F2D056F000DE164 /* BannerCollectionCell.swift */; };
+		77F3884E2F520F1400B6E977 /* BasketButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F3884D2F520F1400B6E977 /* BasketButton.swift */; };
+		77F388502F58AEC900B6E977 /* CapsuleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F3884F2F58AEC900B6E977 /* CapsuleButton.swift */; };
+		77F388522F5B2E2700B6E977 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388512F5B2E2700B6E977 /* NotificationNames.swift */; };
+		77F388542F61E74500B6E977 /* MapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388532F61E74500B6E977 /* MapService.swift */; };
+		77F388562F61E86500B6E977 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388552F61E86500B6E977 /* LocationService.swift */; };
+		77F388592F61E88900B6E977 /* GeocodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388582F61E88900B6E977 /* GeocodeService.swift */; };
+		77F3885C2F61F12A00B6E977 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F3885B2F61F12A00B6E977 /* MapVC.swift */; };
+		77F3885F2F61F29500B6E977 /* AdressPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F3885E2F61F29500B6E977 /* AdressPanelView.swift */; };
+		77F388612F61F2EE00B6E977 /* AdressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388602F61F2ED00B6E977 /* AdressView.swift */; };
+		77F388632F61F2FC00B6E977 /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388622F61F2FC00B6E977 /* SaveButton.swift */; };
+		77F388652F64567200B6E977 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F388642F64567200B6E977 /* CustomTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +131,17 @@
 		77A357B02F2A859E000DE164 /* PhotoCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionCell.swift; sourceTree = "<group>"; };
 		77A357B22F2D041A000DE164 /* BannerContainerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerContainerCell.swift; sourceTree = "<group>"; };
 		77A357B42F2D056F000DE164 /* BannerCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerCollectionCell.swift; sourceTree = "<group>"; };
+		77F3884D2F520F1400B6E977 /* BasketButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketButton.swift; sourceTree = "<group>"; };
+		77F3884F2F58AEC900B6E977 /* CapsuleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleButton.swift; sourceTree = "<group>"; };
+		77F388512F5B2E2700B6E977 /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
+		77F388532F61E74500B6E977 /* MapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapService.swift; sourceTree = "<group>"; };
+		77F388552F61E86500B6E977 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		77F388582F61E88900B6E977 /* GeocodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeocodeService.swift; sourceTree = "<group>"; };
+		77F3885B2F61F12A00B6E977 /* MapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
+		77F3885E2F61F29500B6E977 /* AdressPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdressPanelView.swift; sourceTree = "<group>"; };
+		77F388602F61F2ED00B6E977 /* AdressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdressView.swift; sourceTree = "<group>"; };
+		77F388622F61F2FC00B6E977 /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
+		77F388642F64567200B6E977 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +176,9 @@
 				771054212F364791005E6880 /* LabelInsets.swift */,
 				771054232F365720005E6880 /* EmptyView.swift */,
 				7710544C2F48C61A005E6880 /* CustomStepper.swift */,
+				77F3884D2F520F1400B6E977 /* BasketButton.swift */,
+				77F3884F2F58AEC900B6E977 /* CapsuleButton.swift */,
+				77F388642F64567200B6E977 /* CustomTextField.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -273,6 +298,7 @@
 				77A357A92F23DD43000DE164 /* Menu */,
 				771054322F3F84BF005E6880 /* DetailProduct */,
 				771054442F48A9D4005E6880 /* Basket */,
+				77F3885A2F61F0EB00B6E977 /* Map */,
 				77A357AE2F27F61C000DE164 /* ViewController.swift */,
 				77A357B02F2A859E000DE164 /* PhotoCollectionCell.swift */,
 			);
@@ -319,6 +345,9 @@
 			children = (
 				77A357A52F23D392000DE164 /* ProductService.swift */,
 				7710544E2F4B779A005E6880 /* ProductStorage.swift */,
+				77F388532F61E74500B6E977 /* MapService.swift */,
+				77F388582F61E88900B6E977 /* GeocodeService.swift */,
+				77F388552F61E86500B6E977 /* LocationService.swift */,
 				771054522F51EEE8005E6880 /* ProductRepository.swift */,
 				7710541C2F363D55005E6880 /* CategoryService.swift */,
 				7710542E2F3A4B27005E6880 /* StoryService.swift */,
@@ -334,8 +363,28 @@
 				77A357772F23CB81000DE164 /* Assets.xcassets */,
 				77A357792F23CB81000DE164 /* LaunchScreen.storyboard */,
 				77A3577C2F23CB81000DE164 /* Info.plist */,
+				77F388512F5B2E2700B6E977 /* NotificationNames.swift */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		77F3885A2F61F0EB00B6E977 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				77F3885B2F61F12A00B6E977 /* MapVC.swift */,
+				77F3885D2F61F28300B6E977 /* Views */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
+		77F3885D2F61F28300B6E977 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				77F3885E2F61F29500B6E977 /* AdressPanelView.swift */,
+				77F388602F61F2ED00B6E977 /* AdressView.swift */,
+				77F388622F61F2FC00B6E977 /* SaveButton.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -477,12 +526,14 @@
 			files = (
 				771054352F3F8727005E6880 /* DetailPromoCell.swift in Sources */,
 				7710541F2F363F63005E6880 /* CategoryCollectionCell.swift in Sources */,
+				77F388592F61E88900B6E977 /* GeocodeService.swift in Sources */,
 				77A357732F23CB7F000DE164 /* MenuScreenVC.swift in Sources */,
 				771054222F364791005E6880 /* LabelInsets.swift in Sources */,
 				771054432F437793005E6880 /* DetailSupplementsFooterCell.swift in Sources */,
 				7710542D2F3A48B1005E6880 /* StoriesCollectionCell.swift in Sources */,
 				771054312F3F84B6005E6880 /* DetailProductController.swift in Sources */,
 				77A3579F2F23CD49000DE164 /* ProductCell.swift in Sources */,
+				77F3884E2F520F1400B6E977 /* BasketButton.swift in Sources */,
 				77A357B12F2A859E000DE164 /* PhotoCollectionCell.swift in Sources */,
 				7710541D2F363D55005E6880 /* CategoryService.swift in Sources */,
 				7710544D2F48C61A005E6880 /* CustomStepper.swift in Sources */,
@@ -491,26 +542,35 @@
 				771054172F3126A1005E6880 /* PromoCell.swift in Sources */,
 				7710543F2F423862005E6880 /* SuplementService.swift in Sources */,
 				7710542F2F3A4B27005E6880 /* StoryService.swift in Sources */,
+				77F388612F61F2EE00B6E977 /* AdressView.swift in Sources */,
 				771054242F365720005E6880 /* EmptyView.swift in Sources */,
 				771054532F51EEE9005E6880 /* ProductRepository.swift in Sources */,
 				7710544F2F4B779A005E6880 /* ProductStorage.swift in Sources */,
+				77F388542F61E74500B6E977 /* MapService.swift in Sources */,
 				771054512F4F764E005E6880 /* BasketAddProductContainerCell.swift in Sources */,
 				771054492F48B843005E6880 /* TotalCell.swift in Sources */,
 				7710543B2F3F9355005E6880 /* DetailSupplementsContainerCell.swift in Sources */,
+				77F3885C2F61F12A00B6E977 /* MapVC.swift in Sources */,
+				77F388502F58AEC900B6E977 /* CapsuleButton.swift in Sources */,
+				77F388562F61E86500B6E977 /* LocationService.swift in Sources */,
 				77A357B32F2D041A000DE164 /* BannerContainerCell.swift in Sources */,
 				7710544B2F48BEBB005E6880 /* BasketProductCell.swift in Sources */,
 				77A357A42F23D321000DE164 /* Product.swift in Sources */,
 				77A3576F2F23CB7F000DE164 /* AppDelegate.swift in Sources */,
 				77A357AF2F27F61C000DE164 /* ViewController.swift in Sources */,
 				7710542B2F3A47FB005E6880 /* Story.swift in Sources */,
+				77F388652F64567200B6E977 /* CustomTextField.swift in Sources */,
 				7710543D2F423055005E6880 /* Suplement.swift in Sources */,
 				77A357712F23CB7F000DE164 /* SceneDelegate.swift in Sources */,
 				7710541B2F363CFA005E6880 /* Category.swift in Sources */,
+				77F388632F61F2FC00B6E977 /* SaveButton.swift in Sources */,
+				77F388522F5B2E2700B6E977 /* NotificationNames.swift in Sources */,
 				771054392F3F902B005E6880 /* DetailSegmentsCell.swift in Sources */,
 				771054372F3F8BE3005E6880 /* DetailCell.swift in Sources */,
 				77A357A62F23D392000DE164 /* ProductService.swift in Sources */,
 				771054472F48AA13005E6880 /* BasketVC.swift in Sources */,
 				77A357B52F2D056F000DE164 /* BannerCollectionCell.swift in Sources */,
+				77F3885F2F61F29500B6E977 /* AdressPanelView.swift in Sources */,
 				771054272F38F321005E6880 /* DependencyContainer.swift in Sources */,
 				771054192F363B96005E6880 /* CategoryContainerCell.swift in Sources */,
 			);

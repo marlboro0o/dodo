@@ -48,14 +48,11 @@ class ProductCell: UITableViewCell {
         return label
     }()
     
-    private lazy var priceButton: UIButton = {
-        let button = UIButton()
+    private lazy var priceButton: CapsuleButton = {
+        let button = CapsuleButton()
         button.setTitle("от 469 руб", for: .normal)
-        button.backgroundColor = .orange.withAlphaComponent(0.1)
-        button.layer.cornerRadius = 20
+        button.tintColor = .orange.withAlphaComponent(0.1)
         button.setTitleColor(.brown, for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
-        
         return button
     }()
     

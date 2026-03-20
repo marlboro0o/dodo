@@ -7,7 +7,14 @@
 
 import Foundation
 
-class ProductRepository {
+protocol IProductRepository {
+    func add(product: Product)
+    func change(product: Product)
+    func update(product: Product, count: Int, completion: ([Product]) -> ())
+    func get() -> [Product]
+}
+
+class ProductRepository: IProductRepository {
     
     let storage: ProductStorage
     
@@ -23,6 +30,20 @@ class ProductRepository {
             basket[index] = newProduct
         } else {
             basket.append(product)
+        }
+         
+        do {
+            try storage.save(products: basket, forKey: "basket")
+        } catch {
+            print(error)
+        }
+    }
+    
+    func change(product: Product) {
+        var basket = storage.loadProducts(forKey: "basket") ?? []
+        
+        if let index = basket.firstIndex(of: product) {
+            basket[index] = product
         }
          
         do {

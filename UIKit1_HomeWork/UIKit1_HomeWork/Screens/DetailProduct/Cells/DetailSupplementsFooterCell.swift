@@ -9,16 +9,13 @@ import UIKit
 import SnapKit
 
 class DetailSupplementsFooterCell: UITableViewHeaderFooterView {
+    
     static let reuseId = "DetailSupplementsFooterCell"
     var onTapBasket: (() -> ())? = nil
     
-    private lazy var button: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .orange
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 20
+    private lazy var button: BasketButton = {
+        let button = BasketButton()
         button.setTitle("В корзину", for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets.init(top: 10, left: 10, bottom: 10, right: 10)
         button.addTarget(self, action: #selector(didTapBasket), for: .touchUpInside)
         return button
     }()
@@ -33,8 +30,13 @@ class DetailSupplementsFooterCell: UITableViewHeaderFooterView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(sum: Int) {
-        button.setTitle("В корзину за \(sum) P", for: .normal)
+    func configure(sum: Int, operation: DetailProductController.OperationProduct) {
+        switch operation {
+        case .add:
+            button.setTitle("Добавить в корзину за \(sum) P", for: .normal)
+        case .change:
+            button.setTitle("Изменить (\(sum) P)", for: .normal)
+        }
     }
     
     private func setupViews() {
