@@ -20,7 +20,7 @@ class CustomTextField: UIStackView {
         let textField = UITextField()
         textField.heightAnchor.constraint(equalToConstant: 24).isActive = true
         textField.addTarget(self, action: #selector(didEditing), for: .editingChanged)
-        textField.addTarget(self, action: #selector(didEditing), for: .editingDidEnd)
+        textField.addTarget(self, action: #selector(didEditing), for: .editingDidBegin)
         
         return textField
     }()
@@ -37,7 +37,7 @@ class CustomTextField: UIStackView {
     private func setupUI(_ header: String) {
         axis = .vertical
         alignment = .leading
-        
+        heightAnchor.constraint(equalToConstant: 60).isActive = true
         layer.borderWidth = 2
         layer.borderColor = UIColor.lightGray.cgColor
         layer.cornerRadius = 16

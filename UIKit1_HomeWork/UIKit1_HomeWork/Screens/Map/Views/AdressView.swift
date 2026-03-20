@@ -41,10 +41,40 @@ class AddressView: UIView {
         return stack
     }()
     
-    private let testTextField: CustomTextField = {
-        let textField = CustomTextField(header: "Тестовые данные")
-        
-        return textField
+//    var addressTextField: CustomTextField = {
+//        CustomTextField(header: "Город, улица и дом")
+//    }()
+    private let entranceTextField: CustomTextField = {
+        CustomTextField(header: "Подъезд")
+    }()
+    
+    private let intercomTextField: CustomTextField = {
+        CustomTextField(header: "Домофон")
+    }()
+    
+    private let floorTextField: CustomTextField = {
+        CustomTextField(header: "Этаж")
+    }()
+    
+    private let apartmentTextField: CustomTextField = {
+        CustomTextField(header: "Квартира")
+    }()
+    private let сommentTextField: CustomTextField = {
+        CustomTextField(header: "Комментарий для курьера")
+    }()
+    private let verticalStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 5
+        return stack
+    }()
+    
+    private let horizontStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 5
+        stack.distribution = .fillEqually
+        return stack
     }()
     
     override init(frame: CGRect) {
@@ -66,7 +96,24 @@ extension AddressView {
         
         stackView.addArrangedSubview(discriptionLabel)
         stackView.addArrangedSubview(addressTextField)
-        self.addSubview(testTextField)
+        
+        let hStack = horizontStack
+        hStack.addArrangedSubview(entranceTextField)
+        hStack.addArrangedSubview(intercomTextField)
+        
+        verticalStackView.addArrangedSubview(hStack)
+        
+        let hStack1 = UIStackView()
+        hStack1.axis = .horizontal
+        hStack1.spacing = 5
+        hStack1.distribution = .fillEqually
+        hStack1.addArrangedSubview(floorTextField)
+        hStack1.addArrangedSubview(apartmentTextField)
+        
+        verticalStackView.addArrangedSubview(hStack1)
+        verticalStackView.addArrangedSubview(сommentTextField)
+        
+        self.addSubview(verticalStackView)
     }
     
     func setupConstraints() {
@@ -76,8 +123,8 @@ extension AddressView {
             make.left.right.equalToSuperview()
            // make.bottom.equalToSuperview().inset(16)
         }
-        testTextField.snp.makeConstraints { make in
-            make.top.equalTo(stackView.snp.bottom).offset(10)
+        verticalStackView.snp.makeConstraints { make in
+            make.top.equalTo(addressTextField.snp.bottom).offset(10)
             make.left.right.equalToSuperview()
             make.bottom.equalToSuperview().inset(10)
         }

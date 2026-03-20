@@ -24,14 +24,17 @@ final class MenuScreenVC: UIViewController {
         case products
     }
     
+    private var basket: [Product] = []
+    private let dispatchGroup = DispatchGroup()
     private let productService: IProductService
     private let productRepository: IProductRepository
     private let categoryService: ICategoryService
     private let storyService: IStoryService
+    private var fetchErrors: [Error] = []
     
     private var state: MenuState = .initial {
         didSet {
-            render()
+            render(state)
         }
     }
     private var products: [Product] = []
@@ -80,6 +83,8 @@ final class MenuScreenVC: UIViewController {
         return tableView
     }()
     
+    private let errorView: UIView = ErrorStateView()
+    
     init(productService: IProductService, 
          categoryService: ICategoryService,
          storyService: IStoryService,
@@ -101,50 +106,86 @@ final class MenuScreenVC: UIViewController {
         setupViews()
         setupConstraints()
         setupTargets()
-        fetchProducts()
-        fetchCategories()
-        fetchStories()
-        fetchBasket()
+        fetchAllData()
+
         setupObservers()
     }
     
+    private func fetchAllData() {
+        dispatchGroup.enter()
+        fetchProducts()
+        
+        dispatchGroup.enter()
+        fetchCategories()
+        
+        dispatchGroup.enter()
+        fetchStories()
+        
+        // Уведомление о завершении всех задач
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard 
+                let self = self,
+                self.fetchErrors.isEmpty 
+            else {
+                self?.state = .error
+                return
+            }
+            
+            // Загружаем корзину (синхронная операция)
+            self.fetchBasket()
+            self.state = .loaded
+        }
+    }
+    
     private func fetchProducts() {
-        productService.loadProducts { result in
+        productService.loadProducts { [weak self] result in
+            guard let self else { return }
+            defer { self.dispatchGroup.leave() }
+            
             switch result {
             case .success(let products):
                 self.products = products
                 self.productsFilter = products
             case .failure(let error):
                 print(error.localizedDescription)
+                fetchErrors.append(error)
             }
         }
     }
     
     private func fetchCategories() {
-        categoryService.loadCategories { result in
+        categoryService.loadCategories { [weak self] result in
+            guard let self else { return }
+            defer { self.dispatchGroup.leave() }
+            
             switch result {
             case .success(let categories):
                 self.categories = categories
             case.failure(let error):
                 print(error.localizedDescription)
+                fetchErrors.append(error)
             }
         }
     }
     
     private func fetchStories() {
-        storyService.loadStories { result in
+        storyService.loadStories { [weak self] result in
+            guard let self else { return }
+            defer { self.dispatchGroup.leave() }
+            
             switch result {
             case .success(let stories):
                 self.stories = stories
             case .failure(let error):
                 print(error.localizedDescription)
+                fetchErrors.append(error)
             }
         }
     }
     
     private func fetchBasket() {
-        let basket = productRepository.get()
-        basketButton.isHidden = basket.isEmpty
+        basket = productRepository.get()
+        //basketButton.isHidden = basket.isEmpty
         let sum = basket.reduce(into: 0) { result, product in
             result += product.getSum()
         }
@@ -158,14 +199,17 @@ final class MenuScreenVC: UIViewController {
                                                object: nil)
     }
     
-    private func render() {
+    private func render(_ state: MenuState) {
         switch state {
-        case .initial, .loading:
-            print("init/loading")
-        case .loaded:
-            print("loaded")
+        case .initial, .loading, .loaded:
+            tableView.isHidden = false
+            basketButton.isHidden = basket.isEmpty
+            errorView.isHidden = true
         case .error:
             print("error")
+            tableView.isHidden = true
+            basketButton.isHidden = true
+            errorView.isHidden = false
         }
     }
     
@@ -189,11 +233,16 @@ final class MenuScreenVC: UIViewController {
 extension MenuScreenVC {
     private func setupViews() {
         view.backgroundColor = .white
+        view.addSubview(errorView)
         view.addSubview(tableView)
         view.addSubview(basketButton)
     }
     
     private func setupConstraints() {
+        errorView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         tableView.snp.makeConstraints { make in
             make.left.right.bottom.equalTo(view)
             make.top.equalTo(view.safeAreaLayoutGuide)
@@ -202,6 +251,7 @@ extension MenuScreenVC {
         basketButton.snp.makeConstraints { make in
             make.right.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
         }
+        
     }
     
     private func setupTargets() {

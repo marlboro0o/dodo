@@ -131,8 +131,7 @@ extension MapVC: MKMapViewDelegate {
         print("did change ->", center)
         
         let location = CLLocation(latitude: center.latitude, longitude: center.longitude)
-        //51,67300296826194
-        //39.25349536708044
+       
         fetchAddressFromLocation(location) { addressText in
             self.addressPanelView.update(addressText)
         }
