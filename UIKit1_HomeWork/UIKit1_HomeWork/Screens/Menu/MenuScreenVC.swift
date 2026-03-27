@@ -8,14 +8,24 @@
 import UIKit
 import SnapKit
 
-final class MenuScreenVC: UIViewController {
+protocol IMenuScreenVC: AnyObject {
+    func showProducts(products: [Product])
+    func showCategories(categories: [Category])
+    func showStories(stories: [Story])
+    func updateBasket(sum: Int)
+    func render(_ state: MenuPresenter.MenuState)
+    
+    func navigateProduct()
+}
 
-    enum MenuState {
-        case initial
-        case loading
-        case loaded
-        case error
-    }
+final class MenuScreenVC: UIViewController {
+    
+//    enum MenuState {
+//        case initial
+//        case loading
+//        case loaded
+//        case error
+//    }
     
     enum MenuSection: Int {
         case stories
@@ -24,26 +34,28 @@ final class MenuScreenVC: UIViewController {
         case products
     }
     
-    private var basket: [Product] = []
-    private let dispatchGroup = DispatchGroup()
-    private let productService: IProductService
-    private let productRepository: IProductRepository
-    private let categoryService: ICategoryService
-    private let storyService: IStoryService
-    private var fetchErrors: [Error] = []
+//    private var basket: [Product] = []
+//    private let dispatchGroup = DispatchGroup()
+//    private var fetchErrors: [Error] = []
     
-    private var state: MenuState = .initial {
-        didSet {
-            render(state)
-        }
-    }
-    private var products: [Product] = []
-    private var productsFilter: [Product] = [] {
+//    private let productService: IProductService
+//    private let productRepository: IProductRepository
+//    private let categoryService: ICategoryService
+//    private let storyService: IStoryService
+    
+//    private var state: MenuState = .initial {
+//        didSet {
+//            render(state)
+//        }
+//    }
+    let presenter: IMenuPresenter
+    private var products: [Product] = [] {
         didSet {
             tableView.reloadSections(IndexSet(integer: MenuSection.products.rawValue), with: .automatic)
             tableView.reloadSections(IndexSet(integer: MenuSection.banners.rawValue), with: .automatic)
         }
     }
+   // private var productsFilter: [Product] = []
     private var categories: [Category] = [] {
         didSet {
             tableView.reloadData()
@@ -54,7 +66,7 @@ final class MenuScreenVC: UIViewController {
             tableView.reloadSections(IndexSet(integer: MenuSection.stories.rawValue), with: .automatic)
         }
     }
-    
+    private var sumBasket = 0
     private var basketButton: BasketButton = {
         let button = BasketButton()
         button.setTitle("1000", for: .normal)
@@ -84,15 +96,19 @@ final class MenuScreenVC: UIViewController {
     }()
     
     private let errorView: UIView = ErrorStateView()
-    
-    init(productService: IProductService, 
-         categoryService: ICategoryService,
-         storyService: IStoryService,
-         productRepository: IProductRepository) {
-        self.productService = productService
-        self.categoryService = categoryService
-        self.storyService = storyService
-        self.productRepository = productRepository
+//    init(productService: IProductService,
+//         categoryService: ICategoryService,
+//         storyService: IStoryService,
+//         productRepository: IProductRepository) {
+//        self.productService = productService
+//        self.categoryService = categoryService
+//        self.storyService = storyService
+//        self.productRepository = productRepository
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//    
+    init(presenter: IMenuPresenter) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -106,112 +122,99 @@ final class MenuScreenVC: UIViewController {
         setupViews()
         setupConstraints()
         setupTargets()
-        fetchAllData()
-
-        setupObservers()
+       // fetchAllData()
+        presenter.viewDidLoad()
+        //setupObservers()
     }
     
-    private func fetchAllData() {
-        dispatchGroup.enter()
-        fetchProducts()
-        
-        dispatchGroup.enter()
-        fetchCategories()
-        
-        dispatchGroup.enter()
-        fetchStories()
-        
-        // Уведомление о завершении всех задач
-        dispatchGroup.notify(queue: .main) { [weak self] in
-            guard 
-                let self = self,
-                self.fetchErrors.isEmpty 
-            else {
-                self?.state = .error
-                return
-            }
-            
-            // Загружаем корзину (синхронная операция)
-            self.fetchBasket()
-            self.state = .loaded
-        }
-    }
+//    private func fetchAllData() {
+//        dispatchGroup.enter()
+//        fetchProducts()
+//        
+//        dispatchGroup.enter()
+//        fetchCategories()
+//        
+//        dispatchGroup.enter()
+//        fetchStories()
+//        
+//        // Уведомление о завершении всех задач
+//        dispatchGroup.notify(queue: .main) { [weak self] in
+//            guard 
+//                let self = self,
+//                self.fetchErrors.isEmpty 
+//            else {
+//                self?.state = .error
+//                return
+//            }
+//            
+//            // Загружаем корзину (синхронная операция)
+//            self.fetchBasket()
+//            self.state = .loaded
+//        }
+//    }
+//    
+//    private func fetchProducts() {
+//        productService.loadProducts { [weak self] result in
+//            guard let self else { return }
+//            defer { self.dispatchGroup.leave() }
+//            
+//            switch result {
+//            case .success(let products):
+//                self.products = products
+//                self.productsFilter = products
+//            case .failure(let error):
+//                print(error.localizedDescription)
+//                fetchErrors.append(error)
+//            }
+//        }
+//    }
+//    
+//    private func fetchCategories() {
+//        categoryService.loadCategories { [weak self] result in
+//            guard let self else { return }
+//            defer { self.dispatchGroup.leave() }
+//            
+//            switch result {
+//            case .success(let categories):
+//                self.categories = categories
+//            case.failure(let error):
+//                print(error.localizedDescription)
+//                fetchErrors.append(error)
+//            }
+//        }
+//    }
+//    
+//    private func fetchStories() {
+//        storyService.loadStories { [weak self] result in
+//            guard let self else { return }
+//            defer { self.dispatchGroup.leave() }
+//            
+//            switch result {
+//            case .success(let stories):
+//                self.stories = stories
+//            case .failure(let error):
+//                print(error.localizedDescription)
+//                fetchErrors.append(error)
+//            }
+//        }
+//    }
+//    
+//    private func fetchBasket() {
+//        basket = productRepository.get()
+//        //basketButton.isHidden = basket.isEmpty
+//        let sum = basket.reduce(into: 0) { result, product in
+//            result += product.getSum()
+//        }
+//        basketButton.setTitle("\(sum) P", for: .normal)
+//    }
     
-    private func fetchProducts() {
-        productService.loadProducts { [weak self] result in
-            guard let self else { return }
-            defer { self.dispatchGroup.leave() }
-            
-            switch result {
-            case .success(let products):
-                self.products = products
-                self.productsFilter = products
-            case .failure(let error):
-                print(error.localizedDescription)
-                fetchErrors.append(error)
-            }
-        }
-    }
+//    private func setupObservers() {
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(totalBasketPrice),
+//                                               name: .totalPriceNotification,
+//                                               object: nil)
+//    }
     
-    private func fetchCategories() {
-        categoryService.loadCategories { [weak self] result in
-            guard let self else { return }
-            defer { self.dispatchGroup.leave() }
-            
-            switch result {
-            case .success(let categories):
-                self.categories = categories
-            case.failure(let error):
-                print(error.localizedDescription)
-                fetchErrors.append(error)
-            }
-        }
-    }
-    
-    private func fetchStories() {
-        storyService.loadStories { [weak self] result in
-            guard let self else { return }
-            defer { self.dispatchGroup.leave() }
-            
-            switch result {
-            case .success(let stories):
-                self.stories = stories
-            case .failure(let error):
-                print(error.localizedDescription)
-                fetchErrors.append(error)
-            }
-        }
-    }
-    
-    private func fetchBasket() {
-        basket = productRepository.get()
-        //basketButton.isHidden = basket.isEmpty
-        let sum = basket.reduce(into: 0) { result, product in
-            result += product.getSum()
-        }
-        basketButton.setTitle("\(sum) P", for: .normal)
-    }
-    
-    private func setupObservers() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(totalBasketPrice),
-                                               name: .totalPriceNotification,
-                                               object: nil)
-    }
-    
-    private func render(_ state: MenuState) {
-        switch state {
-        case .initial, .loading, .loaded:
-            tableView.isHidden = false
-            basketButton.isHidden = basket.isEmpty
-            errorView.isHidden = true
-        case .error:
-            print("error")
-            tableView.isHidden = true
-            basketButton.isHidden = true
-            errorView.isHidden = false
-        }
-    }
     
     @objc
     private func didTapBasket() {
@@ -220,16 +223,17 @@ final class MenuScreenVC: UIViewController {
             animated: true)
     }
     
-    @objc
-    private func totalBasketPrice(_ notification: Notification) {
-        if let value = notification.userInfo?["value"] as? Int {
-            basketButton.setTitle("\(value) P", for: .normal)
-            basketButton.isHidden = value == 0
-        }
-    }
+//    @objc
+//    private func totalBasketPrice(_ notification: Notification) {
+//        if let value = notification.userInfo?["value"] as? Int {
+//            basketButton.setTitle("\(value) P", for: .normal)
+//            basketButton.isHidden = value == 0
+//        }
+//    }
 
 }
 
+//MARK: UI
 extension MenuScreenVC {
     private func setupViews() {
         view.backgroundColor = .white
@@ -259,6 +263,7 @@ extension MenuScreenVC {
     }
 }
 
+//MARK: UITableViewDataSource
 extension MenuScreenVC: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -279,7 +284,7 @@ extension MenuScreenVC: UITableViewDataSource {
         case .promo:
             return 1
         case .products:
-            return productsFilter.count
+            return products.count
         }
     }
     
@@ -300,7 +305,7 @@ extension MenuScreenVC: UITableViewDataSource {
             return cell
         case .products:
             let cell = tableView.dequeuCell(indexPath) as ProductCell
-            cell.update(productsFilter[indexPath.row])
+            cell.update(products[indexPath.row])
             return cell
         case .stories:
             let cell = tableView.dequeuCell(indexPath) as StoriesContainerCell
@@ -348,13 +353,54 @@ extension MenuScreenVC: UITableViewDataSource {
     }
 }
 
+//MARK: UITableViewDelegate
 extension MenuScreenVC: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let section = MenuSection.init(rawValue: indexPath.section) else { return }
         
         if section == .products {
-            let vc = di.screenFactory.makeDetailProduct(product: products[indexPath.row], operation: .add)
-            present(vc, animated: true)
+            presenter.didSelectProduct(index: indexPath.row)
+//            let vc = di.screenFactory.makeDetailProduct(product: products[indexPath.row], operation: .add)
+//            present(vc, animated: true)
+        }
+    }
+}
+
+//MARK: IMenuScreenVC
+extension MenuScreenVC: IMenuScreenVC {
+    func navigateProduct() {
+    }
+    
+    func showProducts(products: [Product]) {
+        self.products = products
+    }
+    
+    func showCategories(categories: [Category]) {
+        self.categories = categories
+    }
+    
+    func showStories(stories: [Story]) {
+        self.stories = stories
+    }
+    
+    func updateBasket(sum: Int) {
+        self.sumBasket = sum
+        
+        basketButton.setTitle("\(sum) P", for: .normal)
+        basketButton.isHidden = sum == 0
+    }
+    
+    func render(_ state: MenuPresenter.MenuState) {
+        switch state {
+        case .initial, .loading, .loaded:
+            tableView.isHidden = false
+            basketButton.isHidden = sumBasket == 0
+            errorView.isHidden = true
+        case .error:
+            print("error")
+            tableView.isHidden = true
+            basketButton.isHidden = true
+            errorView.isHidden = false
         }
     }
 }

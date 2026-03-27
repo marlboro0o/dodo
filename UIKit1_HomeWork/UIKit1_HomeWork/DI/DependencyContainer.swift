@@ -11,12 +11,12 @@ final class DependencyContainer {
     fileprivate let session: URLSession
     fileprivate let decoder: JSONDecoder
     fileprivate let encoder: JSONEncoder
-    fileprivate let productService: ProductService
-    fileprivate let productRepository: ProductRepository
-    fileprivate let categoriesService: CategoryService
-    fileprivate let storyService: StoryService
-    fileprivate let suplementService: SuplementService
-    fileprivate let mapService: MapService
+    let productService: ProductService
+    let productRepository: ProductRepository
+    let categoriesService: CategoryService
+    let storyService: StoryService
+    let suplementService: SuplementService
+    let mapService: MapService
     
     let screenFactory: ScreenFactory
     
@@ -44,10 +44,12 @@ final class DependencyContainer {
         weak var di: DependencyContainer!
         
         func makeMenuScreen() -> MenuScreenVC {
-            MenuScreenVC(productService: di.productService,
-                         categoryService: di.categoriesService,
-                         storyService: di.storyService,
-                         productRepository: di.productRepository)
+//            MenuScreenVC(productService: di.productService,
+//                         categoryService: di.categoriesService,
+//                         storyService: di.storyService,
+//                         productRepository: di.productRepository)
+            let configurator = MenuConfigurator()
+            return configurator.configure(di: di)
         }
         
         func makeDetailProduct(product: Product, operation: DetailProductController.OperationProduct) -> DetailProductController {
