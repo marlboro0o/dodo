@@ -44,10 +44,6 @@ final class DependencyContainer {
         weak var di: DependencyContainer!
         
         func makeMenuScreen() -> MenuScreenVC {
-//            MenuScreenVC(productService: di.productService,
-//                         categoryService: di.categoriesService,
-//                         storyService: di.storyService,
-//                         productRepository: di.productRepository)
             let configurator = MenuConfigurator()
             return configurator.configure(di: di)
         }
@@ -60,8 +56,8 @@ final class DependencyContainer {
         }
         
         func makeBasketVC() -> BasketVC {
-            BasketVC(productRepository: di.productRepository,
-                     suplementService: di.suplementService)
+            let configurator = BasketConfigurator()
+            return configurator.configure(di: di)
         }
         
         func makeMapVC() -> MapVC {

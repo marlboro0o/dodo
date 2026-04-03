@@ -11,7 +11,7 @@ import SnapKit
 class BasketProductCell: UITableViewCell {
     static let reuseId = "BaskedProductCell"
     
-    var onTapChangeProduct: (() -> ())?
+    var onTapEditProduct: (() -> ())?
     var onTapChangeCountProduct: ((Int) -> ())?
     
     private lazy var productImageView: UIImageView = {
@@ -138,6 +138,7 @@ class BasketProductCell: UITableViewCell {
     
     @objc
     private func didTapChangeButton() {
-        onTapChangeProduct?()
+       // onTapChangeProduct?()
+        onTapEditProduct?()
     }
 }

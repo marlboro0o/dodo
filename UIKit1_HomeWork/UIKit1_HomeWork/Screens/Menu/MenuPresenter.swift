@@ -10,6 +10,8 @@ import Foundation
 protocol IMenuPresenter: AnyObject {
     func viewDidLoad()
     func didSelectProduct(index: Int)
+    func showBasket()
+    func didTapCategory(category: Category)
 }
 
 class MenuPresenter: IMenuPresenter {
@@ -171,5 +173,20 @@ extension MenuPresenter {
     
     func didSelectProduct(index: Int) {
         router?.showProductScreen(product: products[index])
+    }
+    
+    func showBasket() {
+        router?.showBasket()
+    }
+    
+    func didTapCategory(category: Category) {
+        for (index, item) in categories.enumerated() {
+            if item == category {
+                categories[index] = item.didSelect()
+            } else if item.isSelected {
+                categories[index] = item.didSelect()
+            }
+        }
+        view?.selectRow(category: category)
     }
 }

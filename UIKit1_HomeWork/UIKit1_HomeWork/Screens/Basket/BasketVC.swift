@@ -8,21 +8,24 @@
 import UIKit
 import SnapKit
 
-class BasketVC: UIViewController {
+protocol IBasketVC: AnyObject {
+    func showBasket(basket: [Product])
+}
+
+final class BasketVC: UIViewController {
     enum SectionBasket: Int {
         case total
         case products
         case suplements
     }
     
+    let presenter: IBasketPresenter
     private var basket: [Product] = [] {
         didSet {
             tableView.reloadData()
         }
     }
-    private let suplementService: ISuplementService
-    private let productRepository: IProductRepository
-    
+
     private lazy var closeButton: UIButton = {
         let button = UIButton()
         button.setTitle("Закрыть", for: .normal)
@@ -77,10 +80,8 @@ class BasketVC: UIViewController {
         return button
     }()
     
-    init(productRepository: IProductRepository, suplementService: ISuplementService) {
-        self.productRepository = productRepository
-        self.suplementService = suplementService
-        
+    init(presenter: IBasketPresenter) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -93,10 +94,22 @@ class BasketVC: UIViewController {
         
         setupViews()
         setupConstraints()
-        fetchBasket()
-        setupObservers()
+        presenter.viewDidLoad()
     }
     
+    @objc
+    private func didTapClosed() {
+        presenter.didTapClose()
+    }
+    
+    @objc
+    private func didTapPlaceOrder() {
+        presenter.didTapPlaceOrder()
+    }
+}
+
+//MARK: UI
+extension BasketVC {
     private func setupViews() {
         view.backgroundColor = .white
        
@@ -135,31 +148,16 @@ class BasketVC: UIViewController {
             make.height.equalTo(50)
         }
     }
-    
-    private func fetchBasket() {
-        basket = productRepository.get()
-    }
-    
-    private func setupObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(updateBasket), name: .updateBasket, object: nil)
-    }
-    
-    @objc
-    private func didTapClosed() {
-        dismiss(animated: true)
-    }
-    
-    @objc
-    private func updateBasket() {
-        fetchBasket()
-    }
-    
-    @objc
-    private func didTapPlaceOrder() {
-        present(di.screenFactory.makeMapVC(),animated: true)
+}
+
+//MARK: IBasketVC
+extension BasketVC: IBasketVC {
+    func showBasket(basket: [Product]) {
+        self.basket = basket
     }
 }
 
+//MARK: UITableViewDataSource
 extension BasketVC: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         3
@@ -201,14 +199,12 @@ extension BasketVC: UITableViewDataSource {
             let cell = tableView.dequeuCell(indexPath) as BasketProductCell
             cell.configure(product: basket[indexPath.row])
             
-            cell.onTapChangeProduct = {
-                let vc = di.screenFactory.makeDetailProduct(product: self.basket[indexPath.row], operation: .change)
-                self.present(vc, animated: true)
+            cell.onTapEditProduct = {
+                self.presenter.didTapEditProduct(product: self.basket[indexPath.row])
             }
+            
             cell.onTapChangeCountProduct = { value in
-                self.productRepository.update(product: self.basket[indexPath.row], count: value) { basket in
-                    self.basket = basket
-                }
+                self.presenter.didTapChangeCount(product: self.basket[indexPath.row], count: value)
             }
             
             return cell

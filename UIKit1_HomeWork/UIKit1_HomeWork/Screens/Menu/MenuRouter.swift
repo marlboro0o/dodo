@@ -10,6 +10,7 @@ import UIKit
 
 protocol IMenuRouter {
     func showProductScreen(product: Product)
+    func showBasket()
 }
 
 final class MenuRouter {
@@ -20,5 +21,9 @@ extension MenuRouter: IMenuRouter {
     func showProductScreen(product: Product) {
         let vc = di.screenFactory.makeDetailProduct(product: product, operation: .add)
         view?.present(vc, animated: true)
+    }
+    
+    func showBasket() {
+        view?.present(di.screenFactory.makeBasketVC(), animated: true)
     }
 }
